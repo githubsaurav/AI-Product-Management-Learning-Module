@@ -1,0 +1,198 @@
+'use strict';
+
+const SOURCES = {
+  every: {
+    group: 'Primary articles',
+    title: 'How AI Works',
+    by: 'Nir Zicherman, Every',
+    url: 'https://every.to/p/how-ai-works',
+    use: 'A non-technical explanation of representations; the idea that meaning can be learned from the company words keep; the connection between learned relationships and next-token prediction.',
+  },
+  lenny: {
+    group: 'Primary articles',
+    title: 'An AI Glossary',
+    by: 'Lenny Rachitsky',
+    url: 'https://www.lennysnewsletter.com/p/an-ai-glossary',
+    use: 'Model, LLM, Transformer, Training and pretraining, Post-training, Fine-tuning, RLHF, Prompt engineering, Evals, and Inference. Some sections may be subscriber-only; this module teaches all essential content itself.',
+  },
+  google: {
+    group: 'Primary articles',
+    title: 'Introduction to Large Language Models',
+    by: 'Google Machine Learning Crash Course',
+    url: 'https://developers.google.com/machine-learning/crash-course/llm',
+    use: 'The formal definition of a language model as a model of token probabilities; tokenization and context; parameters; benefits and limitations.',
+  },
+  googleT: {
+    group: 'Primary articles',
+    title: 'What is a large language model?',
+    by: 'Google Machine Learning Crash Course',
+    url: 'https://developers.google.com/machine-learning/crash-course/llm/transformers',
+    use: 'Transformer and self-attention intuition.',
+  },
+  googleTune: {
+    group: 'Primary articles',
+    title: 'Fine-tuning, distillation, and prompt engineering',
+    by: 'Google Machine Learning Crash Course',
+    url: 'https://developers.google.com/machine-learning/crash-course/llm/tuning',
+    use: 'The distinction between fine-tuning and prompting.',
+  },
+  openai: {
+    group: 'Limitation articles',
+    title: 'Why Language Models Hallucinate',
+    by: 'OpenAI',
+    url: 'https://openai.com/index/why-language-models-hallucinate/',
+    use: 'A definition of hallucination; why next-token training does not label every statement true or false; why evaluations that reward guessing can encourage confident errors; the distinction between an error and an appropriate abstention.',
+  },
+  bowman: {
+    group: 'Limitation articles',
+    title: 'Eight Things to Know About Large Language Models',
+    by: 'Samuel R. Bowman',
+    url: 'https://arxiv.org/abs/2304.00612',
+    use: 'The unpredictability of specific capabilities; imperfect steering; limited interpretability; why one successful or failed example does not establish general capability.',
+  },
+  ft: {
+    group: 'Optional deeper reading',
+    title: 'Generative AI Exists Because of the Transformer',
+    by: 'Financial Times',
+    url: 'https://ig.ft.com/generative-ai/',
+    use: 'A visual walkthrough of the transformer. Optional.',
+  },
+  alammar: {
+    group: 'Optional deeper reading',
+    title: 'How GPT-3 Works',
+    by: 'Jay Alammar',
+    url: 'https://jalammar.github.io/how-gpt3-works-visualizations-animations/',
+    use: 'Visualizations of generation. Historical GPT-3 specifications are not required for this module.',
+  },
+  wolfram: {
+    group: 'Optional deeper reading',
+    title: 'What Is ChatGPT Doing … and Why Does It Work?',
+    by: 'Stephen Wolfram',
+    url: 'https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/',
+    use: 'A long-form look at next-token generation. Optional.',
+  },
+};
+
+// [term, definition, screen where it is first taught]
+const DEFINITIONS = [
+  ['AI product', 'A user-facing or internal system that combines one or more models with interfaces, data, instructions, policies, storage, workflows, infrastructure, and human decisions to produce a useful outcome.', 'scene1'],
+  ['Model', 'A learned mathematical system that transforms an input into a prediction or generated output based on patterns acquired during training.', 'orient2'],
+  ['Language model', 'A model that estimates probabilities over tokens or sequences of tokens in context.', 'orient2'],
+  ['Large language model', 'A language model with substantial learned capacity, trained on very large and varied datasets using significant computation.', 'orient2'],
+  ['Foundation model', 'A broadly trained model that can support many downstream tasks and products.', 'orient2'],
+  ['Token', 'A unit processed by a language model, such as a word, subword, punctuation mark, number fragment, or other symbol.', 'scene3'],
+  ['Representation', 'A numerical form that allows a model to work with an item, token, or concept and its relationships.', 'scene3'],
+  ['Parameter or weight', 'A learned numerical value inside a model. Training adjusts parameters to improve predictions.', 'scene3'],
+  ['Pretraining', 'The large initial training stage through which a model learns broad patterns from extensive data.', 'scene3'],
+  ['Self-supervised learning', 'A method in which the data supplies its own learning targets, such as predicting a hidden or following token.', 'scene3'],
+  ['Transformer', 'The neural-network architecture underlying most modern LLMs, designed to model relationships across tokens efficiently and at scale.', 'scene3'],
+  ['Self-attention', 'A transformer mechanism that calculates how strongly tokens in the input should influence one another’s representations.', 'scene3'],
+  ['Training', 'A process that changes model parameters using data and an optimization objective.', 'scene2'],
+  ['Post-training', 'Additional training after pretraining intended to shape usefulness, instruction-following, safety, reasoning behavior, or other desired qualities.', 'scene6'],
+  ['Fine-tuning', 'Additional training on task- or behavior-specific examples that changes at least some model parameters.', 'scene6'],
+  ['Prompt', 'The instructions and input supplied to the model for a particular generation.', 'scene2'],
+  ['Prompting', 'Guiding the current output through instructions, examples, constraints, or relevant input. It does not ordinarily change the model’s parameters.', 'scene2'],
+  ['Inference', 'Running a trained model to generate a prediction or response.', 'scene2'],
+  ['Product storage', 'Information retained by the surrounding application, such as conversation history, preferences, account facts, or feedback. Storage does not itself change model parameters.', 'scene2'],
+  ['Generation', 'The inference process in which an LLM produces an output sequence, typically one token at a time.', 'scene4'],
+  ['Probability distribution', 'A set of relative likelihoods assigned to possible outcomes, such as candidate next tokens.', 'scene4'],
+  ['Temperature', 'A generation setting that affects how strongly selection favors high-probability tokens. It changes variation, not knowledge.', 'scene4'],
+  ['Context', 'The information available to the model for a particular generation.', 'scene5'],
+  ['Context window', 'The bounded token capacity available for input and generated output in a model interaction.', 'scene5'],
+  ['Hallucination', 'A plausible but false or unsupported generated claim.', 'scene7'],
+  ['Abstention', 'A response that declines to provide a specific answer because the available evidence or capability is insufficient.', 'scene7'],
+  ['Deterministic', 'Designed to return the same result from the same input and state.', 'scene4'],
+  ['Probabilistic', 'Based on a distribution of possible outcomes rather than one guaranteed result.', 'scene4'],
+];
+
+const QUIZ = [
+  {
+    q: 'A customer tells the assistant, “Our premium refund period is 45 days.” What is the safest immediate conclusion?',
+    opts: [
+      'The underlying model has permanently learned the policy.',
+      'The information can influence the current response while it is in context; persistence requires a defined storage or training process.',
+      'Every customer will now receive the updated policy.',
+      'The model has gained new parameters.',
+    ],
+    a: 1,
+    why: 'A statement made in the conversation becomes part of the current context; it does not change the model’s parameters. Making it persist requires the product to store it and supply it again, or a separate reviewed training process.',
+    link: 'scene2',
+  },
+  {
+    q: 'A document fits inside the context window. What does that establish?',
+    opts: [
+      'The model will use every detail correctly.',
+      'The model has permanently learned the document.',
+      'The document can be supplied within capacity; correct use must still be evaluated.',
+      'The response will be deterministic.',
+    ],
+    a: 2,
+    why: 'The context window is a capacity boundary for what can be supplied at one moment. Whether the model notices, interprets, and applies every detail correctly is a performance question that must be tested on representative tasks.',
+    link: 'scene5',
+  },
+  {
+    q: 'A legal disclosure must be shown exactly as approved. What is the strongest default design?',
+    opts: [
+      'Ask the LLM to rewrite it on every request.',
+      'Increase temperature.',
+      'Insert fixed approved text or use deterministic logic.',
+      'Fine-tune only on longer documents.',
+    ],
+    a: 2,
+    why: 'Open-ended generation is probabilistic, so wording can vary between runs, and a higher temperature only increases variation. When exact wording is mandatory, the product should insert fixed approved content rather than ask the model to recreate it.',
+    link: 'scene4',
+  },
+  {
+    q: 'The same prompt produces two differently worded but acceptable drafts. What should the PM conclude?',
+    opts: [
+      'One run is necessarily incorrect.',
+      'Variation is expected; the team must decide whether the task can tolerate it and evaluate multiple outputs.',
+      'The model retrained between requests.',
+      'The product lost the user’s data.',
+    ],
+    a: 1,
+    why: 'Several continuations can have meaningful probability, so wording can differ from run to run without any retraining or data loss. The team decides where variation is acceptable and evaluates the distribution of outputs, not one example.',
+    link: 'scene4',
+  },
+  {
+    q: 'A response is fluent, specific, and confident. What has been established?',
+    opts: [
+      'It is probably factual.',
+      'The model internally verified it.',
+      'It is linguistically convincing; factual support still requires evidence.',
+      'Hallucination is impossible.',
+    ],
+    a: 2,
+    why: 'Fluency, specificity, and confidence are properties of the language, not evidence that a claim is true. Factual support has to come from evidence the product can check.',
+    link: 'scene7',
+  },
+  {
+    q: 'Which statement best distinguishes fine-tuning from prompting?',
+    opts: [
+      'Both permanently add the user’s current conversation to the model.',
+      'Fine-tuning changes model parameters using training examples; prompting guides the current generation without ordinarily changing parameters.',
+      'Prompting changes more parameters than fine-tuning.',
+      'Neither affects model behavior.',
+    ],
+    a: 1,
+    why: 'Fine-tuning is a training process: it changes at least some parameters using chosen examples. Prompting changes only what the model receives for the current generation.',
+    link: 'scene2',
+  },
+];
+
+const REVIEW = {
+  q: 'Which statement is most accurate?',
+  opts: [
+    'Every AI model is an LLM.',
+    'An LLM is a type of model, and a broadly reusable LLM can serve as a foundation model.',
+    'A foundation model is the interface surrounding ChatGPT.',
+    '“Large” means the model gives long answers.',
+  ],
+  a: 1,
+  fb: [
+    'Models can classify, rank, predict numbers, generate images, and perform many non-language tasks.',
+    'Correct. This preserves the relationship among the terms.',
+    'The interface is part of the product, not the definition of a foundation model.',
+    'Large primarily refers to training scale and learned capacity, not response length.',
+  ],
+};

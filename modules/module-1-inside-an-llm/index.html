@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inside an LLM</title>
+  <meta name="description" content="Module 1 — What an LLM Is—and Is Not. An interactive product-decision case for AI product managers.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <button type="button" class="tool nav-toggle" id="navToggle" aria-controls="sidebar" aria-expanded="false">Contents</button>
+    <div class="brand">
+      <span class="brand-title">Inside an LLM: Make Better Product Decisions</span>
+      <span class="brand-sub">Module 1 — What an LLM Is—and Is Not</span>
+    </div>
+    <nav class="tools" aria-label="Module tools">
+      <button type="button" class="tool" data-drawer="defs">Definitions</button>
+      <button type="button" class="tool" data-drawer="sources" aria-label="Article sources"><span class="t-long">Article sources</span><span class="t-short" aria-hidden="true">Sources</span></button>
+      <button type="button" class="tool" data-drawer="notes">PM notes <span class="count" id="notesCount"></span></button>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Progress">
+      <p class="sidebar-head">Your progress</p>
+      <ol class="progress" id="progress"></ol>
+    </aside>
+    <main id="main" tabindex="-1">
+      <article class="screen" id="screen"></article>
+      <nav class="pager" id="pager" aria-label="Screen navigation"></nav>
+    </main>
+  </div>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
+    <div class="drawer-head">
+      <h2 id="drawerTitle"></h2>
+      <button type="button" class="tool" id="drawerClose">Close</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="scenes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
